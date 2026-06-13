@@ -1,0 +1,6 @@
+﻿urdu_env/
+__pycache__/
+*.pyc
+triage.log
+pakit.log
+tickets_log.csv

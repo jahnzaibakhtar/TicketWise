@@ -1,0 +1,13 @@
+ticket_text,priority,category,sla_hours
+"UPS kharab ho gaya server down","high","Infrastructure",0.5
+"load shedding se WiFi crash urgent","high","Network",1.0
+"Windows crack expire error","medium","Software",12.0
+"Excel slow hai old laptop pe","low","Software",24.0
+"power cut ke baad printer nahi chal raha","high","Hardware",4.0
+"internet band hai bijli chali gayi","high","Network",1.0
+"pirated Office activation fail","medium","Software",12.0
+"LAN cable loose voltage spike se","medium","Network",6.0
+"database backup fail ho gia","high","Database",2.0
+"server restart karo bijli gayi thi","high","Infrastructure",0.5
+"crack software ka error aa raha","medium","Software",12.0
+"password bhool gaya reset please","low","Security",24.0

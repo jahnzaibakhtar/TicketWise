@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gmail - PakIT Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gmail-bg:#f6f8fc;
+  --white:#fff;
+  --border:#e0e0e0;
+  --hover:#f2f6fc;
+  --selected:#d3e3fd;
+  --text:#202124;
+  --muted:#444746;
+  --light:#70757a;
+  --accent:#1a73e8;
+  --red:#d93025;
+  --yellow:#f9ab00;
+  --green:#1e8e3e;
+  --unread-bg:#fff;
+  --read-bg:#f2f2f2;
+  --sidebar-w:256px;
+  --topbar-h:64px;
+  --sans:'Roboto',sans-serif;
+  --display:'Google Sans',sans-serif;
+}
+body{background:var(--gmail-bg);color:var(--text);font-family:var(--sans);font-size:14px;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--topbar-h);display:flex;align-items:center;padding:8px 16px;gap:8px;flex-shrink:0;background:var(--gmail-bg)}
+.tb-left{display:flex;align-items:center;gap:4px;width:var(--sidebar-w);flex-shrink:0}
+.hamburger{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;color:var(--muted)}
+.hamburger:hover{background:var(--hover)}
+.gmail-logo{display:flex;align-items:center;gap:4px;margin-left:4px}
+.gmail-logo img{height:28px}
+.gmail-wordmark{font-family:var(--display);font-size:22px;font-weight:400;color:#5f6368;margin-left:2px}
+.gmail-wordmark b{color:var(--text);font-weight:400}
+
+.search-bar{flex:1;max-width:720px;background:#eaf1fb;border-radius:24px;height:46px;display:flex;align-items:center;padding:0 16px;gap:12px;transition:background .2s,box-shadow .2s}
+.search-bar:focus-within{background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.search-bar input{flex:1;border:none;background:transparent;font-family:var(--sans);font-size:16px;color:var(--text);outline:none}
+.search-bar input::placeholder{color:var(--light)}
+.search-icon{color:var(--muted);font-size:20px!important}
+.search-tune{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;color:var(--muted)}
+.search-tune:hover{background:#d4e3fc}
+
+.tb-right{display:flex;align-items:center;gap:4px;margin-left:auto}
+.tb-icon-btn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;color:var(--muted);position:relative}
+.tb-icon-btn:hover{background:rgba(0,0,0,.06)}
+.avatar{width:32px;height:32px;border-radius:50%;background:#1a73e8;color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:13px;font-weight:500;cursor:pointer}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--gmail-bg)}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;overflow-y:auto;padding:8px 0}
+.sidebar::-webkit-scrollbar{width:0}
+
+.compose-btn{margin:4px 16px 16px;background:var(--white);border:none;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.2),0 1px 2px rgba(0,0,0,.14);display:flex;align-items:center;gap:12px;padding:16px 24px;cursor:pointer;font-family:var(--display);font-size:14px;font-weight:500;color:var(--text);transition:box-shadow .2s}
+.compose-btn:hover{box-shadow:0 2px 6px rgba(0,0,0,.2),0 2px 4px rgba(0,0,0,.14)}
+.compose-btn .material-icons{color:var(--accent);font-size:20px!important}
+
+.nav-item{display:flex;align-items:center;gap:16px;padding:0 16px 0 26px;height:36px;border-radius:0 18px 18px 0;cursor:pointer;color:var(--muted);font-size:14px;margin-right:16px;transition:background .15s;position:relative}
+.nav-item:hover{background:var(--hover)}
+.nav-item.active{background:#d3e3fd;color:#001d35;font-weight:500}
+.nav-item .material-icons{font-size:20px!important;color:inherit}
+.nav-item .nav-label{flex:1}
+.nav-item .nav-count{font-size:12px;font-weight:500}
+.nav-item.active .nav-count{color:#001d35}
+
+.nav-sep{height:1px;background:var(--border);margin:8px 0}
+
+/* ── PROCESS BTN IN SIDEBAR ── */
+.process-wrap{padding:12px 16px}
+.process-btn{width:100%;background:linear-gradient(135deg,#1a73e8,#1557b0);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-family:var(--display);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:box-shadow .2s}
+.process-btn:hover{box-shadow:0 2px 8px rgba(26,115,232,.5)}
+.process-btn:disabled{background:#bdc1c6;cursor:not-allowed;box-shadow:none}
+
+/* ── MAIN AREA ── */
+.main{flex:1;display:flex;overflow:hidden;background:var(--white);border-radius:16px;margin:0 8px 8px 0}
+
+/* ── EMAIL LIST ── */
+.email-list{width:45%;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.list-toolbar{height:52px;display:flex;align-items:center;padding:0 16px;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0}
+.toolbar-check{width:18px;height:18px;border:2px solid var(--light);border-radius:2px;cursor:pointer}
+.toolbar-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;color:var(--muted)}
+.toolbar-icon:hover{background:var(--hover)}
+.toolbar-icon .material-icons{font-size:18px!important}
+.toolbar-sep{height:20px;width:1px;background:var(--border);margin:0 4px}
+.toolbar-count{font-size:13px;color:var(--light);margin-left:auto}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab{display:flex;align-items:center;gap:6px;padding:0 24px;height:44px;font-size:13px;color:var(--light);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s}
+.tab:hover{background:var(--hover);color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .material-icons{font-size:16px!important}
+.tab-count{font-size:11px;font-weight:500}
+
+.emails-scroll{overflow-y:auto;flex:1}
+.emails-scroll::-webkit-scrollbar{width:4px}
+.emails-scroll::-webkit-scrollbar-thumb{background:#c4c7c5;border-radius:4px}
+
+/* EMAIL ROW */
+.email-row{display:flex;align-items:center;padding:0 16px;height:52px;border-bottom:1px solid #f0f0f0;cursor:pointer;gap:8px;transition:box-shadow .15s}
+.email-row.unread{background:var(--white);font-weight:500}
+.email-row.read{background:var(--read-bg)}
+.email-row:hover{box-shadow:inset 1px 0 0 #dadce0,inset -1px 0 0 #dadce0,0 1px 2px rgba(60,64,67,.3),0 2px 6px rgba(60,64,67,.15);z-index:1;position:relative}
+.email-row.selected{background:#d3e3fd}
+.email-row.selected:hover{background:#c2dafb}
+
+.row-star{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:#5f6368;flex-shrink:0}
+.row-star .material-icons{font-size:18px!important}
+.row-star:hover .material-icons{color:#f9ab00}
+.row-star.starred .material-icons{color:#f9ab00}
+
+.row-from{width:160px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.row-mid{flex:1;display:flex;align-items:center;gap:6px;min-width:0}
+.row-subject{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-dash{color:var(--light);flex-shrink:0}
+.row-preview{font-size:14px;color:var(--light);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.row-tags{display:flex;gap:4px;flex-shrink:0}
+.gtag{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500;white-space:nowrap;opacity:0;transform:scale(.9);transition:all .25s}
+.gtag.show{opacity:1;transform:scale(1)}
+.gtag-high{background:#fce8e6;color:#c5221f}
+.gtag-medium{background:#fef7e0;color:#b06000}
+.gtag-low{background:#e6f4ea;color:#137333}
+.gtag-dept{background:#e8f0fe;color:#1967d2}
+.gtag-lang{background:#f3e8fd;color:#681da8}
+
+.row-time{font-size:12px;color:var(--light);white-space:nowrap;flex-shrink:0;min-width:48px;text-align:right}
+
+/* ── DETAIL ── */
+.detail{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.detail-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--light)}
+.detail-empty .material-icons{font-size:80px!important;color:#e0e0e0;margin-bottom:16px}
+.detail-empty p{font-size:16px}
+
+.detail-scroll{overflow-y:auto;flex:1;padding:16px 24px}
+.detail-scroll::-webkit-scrollbar{width:4px}
+.detail-scroll::-webkit-scrollbar-thumb{background:#c4c7c5;border-radius:4px}
+
+.d-subject{font-family:var(--display);font-size:22px;font-weight:400;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.d-label{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500}
+
+.d-meta{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.d-avatar{width:40px;height:40px;border-radius:50%;background:#5f6368;color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:16px;font-weight:500;flex-shrink:0}
+.d-from{font-size:14px;font-weight:500;color:var(--text)}
+.d-email-addr{font-size:12px;color:var(--light)}
+.d-time-detail{font-size:12px;color:var(--light);margin-left:auto;white-space:nowrap}
+
+.d-body{font-size:14px;line-height:1.7;color:var(--text);padding:8px 0 20px;border-bottom:1px solid var(--border);white-space:pre-wrap}
+
+/* AI RESULT CARD */
+.ai-card{background:#f8f9fa;border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px}
+.ai-card-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-family:var(--display);font-size:13px;font-weight:500;color:var(--muted)}
+.ai-card-header .material-icons{font-size:18px!important;color:var(--accent)}
+.ai-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ai-box{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.ai-box-label{font-size:11px;color:var(--light);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.ai-box-val{font-size:16px;font-weight:500;color:var(--text)}
+.ai-box-sub{font-size:11px;color:var(--light);margin-top:2px}
+.prio-high{color:#d93025}
+.prio-medium{color:#b06000}
+.prio-low{color:#1e8e3e}
+.conf-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.conf-bg{flex:1;height:4px;background:#e0e0e0;border-radius:4px;overflow:hidden}
+.conf-fill{height:100%;border-radius:4px;transition:width .6s}
+.conf-txt{font-size:11px;color:var(--light);min-width:32px;text-align:right}
+.pending-ai{text-align:center;padding:20px;color:var(--light);font-size:13px}
+.pending-ai .material-icons{font-size:32px!important;color:#e0e0e0;display:block;margin:0 auto 8px}
+
+/* PROGRESS BAR */
+.prog-bar{height:3px;background:var(--accent);width:0%;transition:width .4s ease;position:fixed;top:0;left:0;z-index:9999}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* STATUS BAR */
+.status-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;display:none;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:200}
+.status-bar.show{display:flex}
+</style>
+</head>
+<body>
+
+<div class="prog-bar" id="progBar"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-left">
+    <div class="hamburger"><span class="material-icons">menu</span></div>
+    <div class="gmail-logo">
+      <svg height="28" viewBox="0 0 75 75" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 15h65v45H5z" fill="#fff" stroke="#ddd" stroke-width="1"/>
+        <path d="M5 15l32.5 22L70 15" fill="none" stroke="#ea4335" stroke-width="3"/>
+        <path d="M5 15v45h10V30l22.5 15L60 30v30h10V15" fill="#4285f4"/>
+        <path d="M5 15l32.5 22L70 15H5z" fill="#ea4335"/>
+      </svg>
+      <span class="gmail-wordmark">G<b>mail</b></span>
+    </div>
+  </div>
+  <div class="search-bar">
+    <span class="material-icons search-icon">search</span>
+    <input type="text" placeholder="Search mail"/>
+    <div class="search-tune"><span class="material-icons" style="font-size:18px!important">tune</span></div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-icon-btn"><span class="material-icons">help_outline</span></div>
+    <div class="tb-icon-btn"><span class="material-icons">settings</span></div>
+    <div class="tb-icon-btn"><span class="material-icons">apps</span></div>
+    <div class="tb-icon-btn">
+      <div class="avatar">PK</div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="compose-btn">
+      <span class="material-icons">edit</span>
+      Compose
+    </div>
+
+    <div class="nav-item active">
+      <span class="material-icons">inbox</span>
+      <span class="nav-label">Inbox</span>
+      <span class="nav-count" id="unreadCount">10</span>
+    </div>
+    <div class="nav-item">
+      <span class="material-icons">star_border</span>
+      <span class="nav-label">Starred</span>
+    </div>
+    <div class="nav-item">
+      <span class="material-icons">schedule</span>
+      <span class="nav-label">Snoozed</span>
+    </div>
+    <div class="nav-item">
+      <span class="material-icons">send</span>
+      <span class="nav-label">Sent</span>
+    </div>
+    <div class="nav-item">
+      <span class="material-icons">draft</span>
+      <span class="nav-label">Drafts</span>
+      <span class="nav-count">3</span>
+    </div>
+    <div class="nav-sep"></div>
+
+    <!-- Priority Folders -->
+    <div class="nav-item">
+      <span class="material-icons" style="color:#d93025">label</span>
+      <span class="nav-label">High Priority</span>
+      <span class="nav-count" id="highCount" style="color:#d93025">0</span>
+    </div>
+    <div class="nav-item">
+      <span class="material-icons" style="color:#b06000">label</span>
+      <span class="nav-label">Medium</span>
+      <span class="nav-count" id="medCount" style="color:#b06000">0</span>
+    </div>
+    <div class="nav-item">
+      <span class="material-icons" style="color:#1e8e3e">label</span>
+      <span class="nav-label">Low Priority</span>
+      <span class="nav-count" id="lowCount" style="color:#1e8e3e">0</span>
+    </div>
+    <div class="nav-sep"></div>
+
+    <!-- AI Process Button -->
+    <div class="process-wrap">
+      <button class="process-btn" id="processBtn" onclick="processAll()">
+        <span class="material-icons" style="font-size:16px!important">auto_awesome</span>
+        <span id="btnTxt">Auto-Triage Inbox</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- EMAIL LIST -->
+    <div class="email-list">
+      <div class="list-toolbar">
+        <div class="toolbar-check"></div>
+        <div class="toolbar-icon"><span class="material-icons">refresh</span></div>
+        <div class="toolbar-icon"><span class="material-icons">more_vert</span></div>
+        <div class="toolbar-sep"></div>
+        <div class="toolbar-icon"><span class="material-icons">chevron_left</span></div>
+        <div class="toolbar-count" id="toolbarCount">1–10 of 10</div>
+        <div class="toolbar-icon"><span class="material-icons">chevron_right</span></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active">
+          <span class="material-icons">inbox</span>
+          Primary
+          <span class="tab-count" id="primaryCount"></span>
+        </div>
+        <div class="tab">
+          <span class="material-icons">people</span>
+          Social
+        </div>
+        <div class="tab">
+          <span class="material-icons">local_offer</span>
+          Promotions
+        </div>
+      </div>
+      <div class="emails-scroll" id="emailScroll">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- DETAIL -->
+    <div class="detail" id="detailPane">
+      <div class="detail-empty" id="detailEmpty">
+        <span class="material-icons">mark_email_unread</span>
+        <p>Select an email to read</p>
+      </div>
+      <div class="detail-scroll" id="detailScroll" style="display:none"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar" id="statusBar">
+  <span class="material-icons" style="font-size:18px!important">auto_awesome</span>
+  <span id="statusTxt"></span>
+</div>
+
+<script>
+const EMAILS = [
+  {id:1,from:'Asad Khan',email:'asad.khan@factory.pk',subject:'UPS kharab ho gaya - server down',
+   body:'Bhai urgent hai, hamara UPS kharab ho gaya aur server down ho gaya hai.\nPoori office ka kaam ruk gaya hai. Jaldi fix karo please.\n\nYe doosri dafa ho raha hai is hafte.',
+   time:'9:02 AM',starred:false},
+  {id:2,from:'Nadia Hussain',email:'nadia.h@textiles.pk',subject:'Load shedding se WiFi crash urgent',
+   body:'Load shedding ke baad se hamara WiFi chal nahi raha.\nRouter restart kiya lekin internet band hai.\nUrgent hai kyunke client meeting hai 1 baje.',
+   time:'9:15 AM',starred:false},
+  {id:3,from:'Faisal Mirza',email:'faisal.m@mirza.co',subject:'Printer not working after power cut',
+   body:'The office printer stopped working after the power cut this morning.\nWe have documents to print for a client presentation at 11 AM.\nPlease send someone urgently.',
+   time:'9:28 AM',starred:true},
+  {id:4,from:'Zara Malik',email:'zara.malik@softco.pk',subject:'Password bhool gaya - account locked',
+   body:'Mera Windows password bhool gaya aur account lock ho gaya.\nKoi urgent kaam nahi hai lekin kal tak access chahiye.\nReset kar dein please, shukriya.',
+   time:'9:41 AM',starred:false},
+  {id:5,from:'Umar Farooq',email:'umar.f@farooq.com',subject:'Excel slow hai old laptop pe',
+   body:'Mera Excel bohat slow chal raha hai is purane laptop pe.\nFiles open hone mein 5 minute lagte hain.\nJab time mile fix kar dena, koi rush nahi.',
+   time:'9:55 AM',starred:false},
+  {id:6,from:'Sana Rizvi',email:'sana.r@rizvi.pk',subject:'Database backup fail ho gia raat ko',
+   body:'Raat wali automated database backup fail ho gayi.\nError log mein disk space issue show ho raha hai.\nDBA team se check karwao please.',
+   time:'10:10 AM',starred:false},
+  {id:7,from:'Kamran Baig',email:'kamran.b@baig.net',subject:'URGENT: Entire network is down!!',
+   body:'Our entire office network has gone down completely.\nNo one can access the internet or any internal systems.\nWe have 20 employees sitting completely idle.\nThis is critical — please respond IMMEDIATELY.',
+   time:'10:23 AM',starred:true},
+  {id:8,from:'Mehwish Tariq',email:'mehwish.t@tariq.com',subject:'Windows activation error aa raha',
+   body:'Windows activation error aa raha hai screen pe.\nCrack expire ho gaya lagta hai.\nGenuine license chahiye ya koi fix batao.\nKoi urgent nahi, jab time mile.',
+   time:'10:38 AM',starred:false},
+  {id:9,from:'Bilal Chaudhry',email:'bilal.c@chaudhry.pk',subject:'LAN cable loose after voltage spike',
+   body:'After yesterday\'s voltage spike, the LAN cable connection keeps disconnecting.\nSometimes it works fine, sometimes it drops completely.\nIntermittent issue but getting annoying.',
+   time:'10:52 AM',starred:false},
+  {id:10,from:'Hira Siddiqui',email:'hira.s@siddiqui.co',subject:'How to setup VPN on home laptop?',
+   body:'Hi, I would like to know how to setup the company VPN on my home laptop.\nNo urgency at all, just need guidance when you have time.\nThanks in advance!',
+   time:'11:05 AM',starred:false},
+];
+
+const PRIO_DESC = {high:'Respond immediately',medium:'Handle within SLA',low:'Schedule when available'};
+const SLA_MAP   = {high:'2 hours',medium:'8 hours',low:'24 hours'};
+const CONF_COL  = {high:'#d93025',medium:'#f9ab00',low:'#1e8e3e'};
+const AV_COLORS = ['#1a73e8','#d93025','#1e8e3e','#f9ab00','#9c27b0','#00838f','#ef6c00','#c2185b'];
+
+let results    = {};
+let selectedId = null;
+let processing = false;
+
+function avColor(name) {
+  let h = 0;
+  for (let c of name) h = (h*31 + c.charCodeAt(0)) & 0xffff;
+  return AV_COLORS[h % AV_COLORS.length];
+}
+
+function initials(name) {
+  const p = name.split(' ');
+  return p.length >= 2 ? p[0][0]+p[1][0] : name.substring(0,2);
+}
+
+function updateCounts() {
+  const hi  = Object.values(results).filter(r=>r.priority==='high').length;
+  const med = Object.values(results).filter(r=>r.priority==='medium').length;
+  const lo  = Object.values(results).filter(r=>r.priority==='low').length;
+  document.getElementById('highCount').textContent = hi  || '';
+  document.getElementById('medCount').textContent  = med || '';
+  document.getElementById('lowCount').textContent  = lo  || '';
+  const unread = EMAILS.length - Object.keys(results).length;
+  document.getElementById('unreadCount').textContent = unread || '';
+  document.getElementById('primaryCount').textContent = unread ? unread : '';
+}
+
+function renderList() {
+  const scroll = document.getElementById('emailScroll');
+  scroll.innerHTML = EMAILS.map(e => {
+    const r      = results[e.id];
+    const isRead = !!r;
+    const isSel  = selectedId === e.id;
+    const tags   = r ? `
+      <div class="row-tags">
+        <span class="gtag gtag-${r.priority} show">${r.priority}</span>
+        <span class="gtag gtag-dept show">${r.department}</span>
+      </div>` : '';
+    return `
+    <div class="email-row ${isRead?'read':'unread'} ${isSel?'selected':''}"
+         id="row-${e.id}" onclick="selectEmail(${e.id})">
+      <div class="row-star ${e.starred?'starred':''}" onclick="event.stopPropagation()">
+        <span class="material-icons">${e.starred?'star':'star_border'}</span>
+      </div>
+      <div class="row-from">${e.from}</div>
+      <div class="row-mid">
+        <span class="row-subject">${e.subject}</span>
+        <span class="row-dash">-</span>
+        <span class="row-preview">${e.body.split('\n')[0]}</span>
+        ${tags}
+      </div>
+      <div class="row-time">${e.time}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectEmail(id) {
+  selectedId = id;
+  renderList();
+  const e = EMAILS.find(x=>x.id===id);
+  const r = results[id];
+  document.getElementById('detailEmpty').style.display  = 'none';
+  const scroll = document.getElementById('detailScroll');
+  scroll.style.display = 'block';
+
+  const aiSection = r ? `
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <span class="material-icons">auto_awesome</span>
+        PakIT AI — Ticket Classification
+      </div>
+      <div class="ai-result-grid">
+        <div class="ai-box">
+          <div class="ai-box-label">Priority</div>
+          <div class="ai-box-val prio-${r.priority}">${r.priority.toUpperCase()}</div>
+          <div class="ai-box-sub">${PRIO_DESC[r.priority]}</div>
+          ${r.confidence ? `
+          <div class="conf-row">
+            <div class="conf-bg"><div class="conf-fill" style="width:${r.confidence}%;background:${CONF_COL[r.priority]}"></div></div>
+            <div class="conf-txt">${r.confidence}%</div>
+          </div>` : ''}
+        </div>
+        <div class="ai-box">
+          <div class="ai-box-label">Assigned to</div>
+          <div class="ai-box-val">${r.staff_name}</div>
+          <div class="ai-box-sub">${r.staff_role}</div>
+        </div>
+        <div class="ai-box">
+          <div class="ai-box-label">Department</div>
+          <div class="ai-box-val">${r.department}</div>
+          <div class="ai-box-sub">SLA: ${SLA_MAP[r.priority]}</div>
+        </div>
+        <div class="ai-box">
+          <div class="ai-box-label">Language</div>
+          <div class="ai-box-val" style="color:#681da8">${r.language}</div>
+          <div class="ai-box-sub">Roman Urdu NLP</div>
+        </div>
+      </div>
+    </div>` : `
+    <div class="ai-card">
+      <div class="pending-ai">
+        <span class="material-icons">auto_awesome</span>
+        Click "Auto-Triage Inbox" to classify this ticket
+      </div>
+    </div>`;
+
+  scroll.innerHTML = `
+    <div class="d-subject">
+      ${e.subject}
+      ${r ? `<span class="d-label gtag-${r.priority}" style="font-size:12px;padding:3px 10px;border-radius:12px">${r.priority}</span>` : ''}
+    </div>
+    <div class="d-meta">
+      <div class="d-avatar" style="background:${avColor(e.from)}">${initials(e.from)}</div>
+      <div>
+        <div class="d-from">${e.from}</div>
+        <div class="d-email-addr">&lt;${e.email}&gt;</div>
+      </div>
+      <div class="d-time-detail">Today, ${e.time}</div>
+    </div>
+    <div class="d-body">${e.body}</div>
+    ${aiSection}`;
+}
+
+async function processAll() {
+  if (processing) return;
+  processing = true;
+  const btn = document.getElementById('processBtn');
+  const txt = document.getElementById('btnTxt');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spin"></span> Processing...';
+
+  const bar = document.getElementById('progBar');
+  bar.style.width = '3%';
+
+  const unprocessed = EMAILS.filter(e=>!results[e.id]);
+  showStatus(`Classifying ${unprocessed.length} tickets...`);
+
+  for (let i=0; i<unprocessed.length; i++) {
+    const e   = unprocessed[i];
+    const row = document.getElementById('row-'+e.id);
+    if (row) row.style.opacity = '.5';
+    showStatus(`Classifying: "${e.subject.substring(0,40)}..."`);
+
+    try {
+      const res  = await fetch('/classify', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ticket: e.subject+' '+e.body})
+      });
+      const data = await res.json();
+      if (!data.error) results[e.id] = data;
+    } catch(err) { console.error(err); }
+
+    if (row) row.style.opacity = '1';
+    bar.style.width = Math.round(((i+1)/unprocessed.length)*95)+'%';
+    updateCounts();
+    renderList();
+    if (selectedId===e.id) selectEmail(e.id);
+    await sleep(380);
+  }
+
+  bar.style.width = '100%';
+  setTimeout(()=>{bar.style.width='0';bar.style.transition='none';setTimeout(()=>bar.style.transition='width .4s ease',50);},600);
+
+  btn.disabled = false;
+  txt.innerHTML = '<span class="material-icons" style="font-size:16px!important">check_circle</span> All Triaged';
+  showStatus('All tickets classified ✓', 3000);
+  processing = false;
+}
+
+function showStatus(msg, dur) {
+  const bar = document.getElementById('statusBar');
+  document.getElementById('statusTxt').textContent = msg;
+  bar.classList.add('show');
+  if (dur) setTimeout(()=>bar.classList.remove('show'), dur);
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+updateCounts();
+renderList();
+</script>
+</body>
+</html>
