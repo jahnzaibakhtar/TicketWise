@@ -151,6 +151,8 @@ def classify():
             ticket.count('!'),                                 # exclamation_count
             len(core),                                         # text_length
             len(core.split()),                                 # word_count
+            ticket.count(chr(63)),                             # question_count
+            count_kw(core, high_keywords) - count_kw(core, low_keywords),  # kw_diff
         ]])
 
         features = hstack([tfidf_feat, extra_feat])
